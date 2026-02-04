@@ -28,16 +28,18 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
     return map;
   }, [questions]);
 
+  // ป้องกัน NaN โดยใช้ Number() และ || 0
   const totalScore = useMemo(() => {
-    return Object.values(answers).reduce((acc, curr) => acc + curr.score, 0);
+    return Object.values(answers).reduce((acc, curr) => acc + (Number(curr.score) || 0), 0);
   }, [answers]);
 
   const maxPossibleScore = useMemo(() => {
-    return questions.reduce((acc, q) => acc + q.scoreHigh, 0);
+    return questions.reduce((acc, q) => acc + (Number(q.scoreHigh) || 0), 0);
   }, [questions]);
 
   const handleScore = (q: Question, level: 'Low' | 'Mid' | 'High') => {
-    const score = level === 'Low' ? q.scoreLow : level === 'Mid' ? q.scoreMid : q.scoreHigh;
+    const rawScore = level === 'Low' ? q.scoreLow : level === 'Mid' ? q.scoreMid : q.scoreHigh;
+    const score = Number(rawScore) || 0;
     setAnswers(prev => ({
       ...prev,
       [q.id]: { questionId: q.id, level, score }
@@ -96,7 +98,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
         </button>
         <div className="text-center">
           <h2 className="font-bold text-slate-800 text-sm">ประเมิน: {candidate.name}</h2>
-          <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{candidate.position}</p>
+          <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{candidate.id}</p>
         </div>
         <button onClick={onBack} className="text-slate-400 hover:text-blue-600">
           <Home className="w-5 h-5" />
@@ -111,8 +113,8 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
             <span className="text-xs bg-blue-500 px-2 py-0.5 rounded-full font-bold">พื้นที่: {candidate.area}</span>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-5xl font-black">{totalScore}</span>
-            <span className="text-slate-500 font-bold text-lg">/ {maxPossibleScore}</span>
+            <span className="text-5xl font-black">{totalScore || 0}</span>
+            <span className="text-slate-500 font-bold text-lg">/ {maxPossibleScore || 0}</span>
           </div>
         </div>
 
@@ -125,7 +127,10 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
             {qs.map(q => (
               <div key={q.id} className="glass-card p-5 rounded-3xl border-none shadow-sm space-y-4">
                 <h5 className="font-bold text-slate-800 text-[15px] leading-snug">{q.question}</h5>
-                <p className="text-xs text-slate-500 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">{q.detail}</p>
+                
+                <div className="w-full bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs text-slate-500 min-h-[60px] flex items-center leading-relaxed">
+                  {q.detail || "ไม่มีรายละเอียดเพิ่มเติม"}
+                </div>
                 
                 <div className="grid grid-cols-3 gap-3">
                   {(['Low', 'Mid', 'High'] as const).map(lvl => {
@@ -141,7 +146,8 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
                             : 'bg-white text-slate-400 border-slate-100 hover:border-blue-200'}`}
                       >
                         <span className="text-[10px] font-black uppercase mb-1">{lvl}</span>
-                        <span className={`text-sm font-bold ${isActive ? 'text-white' : 'text-slate-800'}`}>{val} แต้ม</span>
+                        {/* แสดงเฉพาะตัวเลขคะแนน โดยเอาคำว่า "แต้ม" ออกตามคำขอ */}
+                        <span className={`text-sm font-bold ${isActive ? 'text-white' : 'text-slate-800'}`}>{val || 0}</span>
                       </button>
                     );
                   })}
