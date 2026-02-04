@@ -1,9 +1,8 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Candidate, Question, User, EvaluationAnswer } from '../types';
-// Added RefreshCw to imports
+import { Candidate, Question, User, EvaluationAnswer } from '../types.ts';
 import { ChevronLeft, Save, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
-import { submitEvaluation } from '../services/api';
+import { submitEvaluation } from '../services/api.ts';
 
 interface EvaluationFormProps {
   candidate: Candidate;
@@ -20,7 +19,6 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
   const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Group questions by category
   const categories = useMemo(() => {
     const map: Record<string, Question[]> = {};
     questions.forEach(q => {
@@ -50,7 +48,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
 
   const handleSubmit = async () => {
     if (Object.keys(answers).length < questions.length) {
-      setError('กรุณาประเมินให้ครบทุกหัวข้อ');
+      setError('กรุณาประเมินให้ครบทุกหัวข้อก่อนบันทึก');
       return;
     }
 
@@ -73,19 +71,19 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
         onSubmitSuccess();
       }, 2000);
     } catch (err) {
-      setError('ส่งข้อมูลไม่สำเร็จ กรุณาลองใหม่');
+      setError('บันทึกข้อมูลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
       setIsSubmitting(false);
     }
   };
 
   if (showSuccess) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8 bg-white animate-fadeIn">
+      <div className="flex-1 flex flex-col items-center justify-center p-8 bg-white animate-fadeIn text-center">
         <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6">
           <CheckCircle className="w-16 h-16 text-green-500 animate-bounce" />
         </div>
         <h2 className="text-2xl font-bold text-slate-800 mb-2">บันทึกสำเร็จ</h2>
-        <p className="text-slate-500">ข้อมูลการประเมินถูกส่งเข้าระบบแล้ว</p>
+        <p className="text-slate-500">ข้อมูลการประเมินถูกส่งเข้าสู่ระบบ Google Sheets เรียบร้อยแล้ว</p>
       </div>
     );
   }
@@ -97,7 +95,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
           <ChevronLeft className="w-6 h-6" />
         </button>
         <div className="text-center">
-          <h2 className="font-bold text-slate-800">แบบประเมิน</h2>
+          <h2 className="font-bold text-slate-800">แบบประเมินผู้สมัคร</h2>
           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{candidate.name}</p>
         </div>
         <div className="w-10"></div>
@@ -117,7 +115,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
           </div>
           <div className="h-px bg-white/10 w-full mb-3"></div>
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-blue-200 uppercase font-bold">Total Score</span>
+            <span className="text-[10px] text-blue-200 uppercase font-bold">คะแนนรวมสุทธิ</span>
             <span className="text-2xl font-black">{totalScore.toFixed(2)}</span>
           </div>
         </div>
@@ -126,7 +124,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
         {Object.entries(categories).map(([category, qs]) => (
           <div key={category} className="space-y-4">
             <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest pl-2 border-l-4 border-blue-500">
-              {category}
+              หมวด: {category}
             </h4>
             {qs.map(q => (
               <div key={q.id} className="glass-card p-5 rounded-3xl space-y-4">
@@ -160,12 +158,12 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
         {/* Comments */}
         <div className="space-y-4">
           <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest pl-2 border-l-4 border-slate-300">
-            ความคิดเห็นเพิ่มเติม
+            ความคิดเห็นเพิ่มเติมจากผู้สัมภาษณ์
           </h4>
           <textarea
             value={comments}
             onChange={(e) => setComments(e.target.value)}
-            placeholder="ใส่รายละเอียดเพิ่มเติมที่นี่..."
+            placeholder="ระบุรายละเอียด หรือข้อเสนอแนะเพิ่มเติม..."
             className="w-full glass-card p-4 rounded-3xl min-h-[120px] text-sm focus:ring-2 focus:ring-blue-500 border-none outline-none"
           />
         </div>

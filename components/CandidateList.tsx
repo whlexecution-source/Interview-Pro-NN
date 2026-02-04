@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { Candidate, User } from '../types';
+import { Candidate, User } from '../types.ts';
 import { Search, MapPin, CheckCircle2, UserCircle2, ChevronRight, RefreshCw } from 'lucide-react';
 
 interface CandidateListProps {
@@ -34,7 +34,9 @@ const CandidateList: React.FC<CandidateListProps> = ({ candidates, user, onSelec
             </div>
             <div>
               <h2 className="font-bold text-slate-800 text-lg leading-tight">{user.name}</h2>
-              <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider">{user.role}</span>
+              <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider">
+                {user.role === 'Recruiter' ? 'เจ้าหน้าที่สรรหา' : 'หัวหน้างาน'}
+              </span>
             </div>
           </div>
           <button 
@@ -62,7 +64,7 @@ const CandidateList: React.FC<CandidateListProps> = ({ candidates, user, onSelec
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 pb-24">
         <div className="px-2 mb-4">
           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-            {user.role === 'Recruiter' ? 'Candidates (All Areas)' : `Candidates in ${user.area}`}
+            {user.role === 'Recruiter' ? 'รายชื่อผู้สมัครทั้งหมด' : `รายชื่อผู้สมัครในพื้นที่ ${user.area}`}
           </p>
         </div>
 
@@ -94,7 +96,7 @@ const CandidateList: React.FC<CandidateListProps> = ({ candidates, user, onSelec
               
               {candidate.status === 'สัมภาษณ์แล้ว' && (
                 <div className="absolute top-0 right-0">
-                  <div className="bg-green-500 text-white text-[9px] px-2 py-0.5 rounded-bl-lg font-bold">DONE</div>
+                  <div className="bg-green-500 text-white text-[9px] px-2 py-0.5 rounded-bl-lg font-bold">สัมภาษณ์แล้ว</div>
                 </div>
               )}
             </button>
@@ -105,7 +107,6 @@ const CandidateList: React.FC<CandidateListProps> = ({ candidates, user, onSelec
       {/* Floating Indicators */}
       <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto pointer-events-none">
          <div className="px-6 py-4 bg-gradient-to-t from-slate-50 via-slate-50 to-transparent">
-            {/* Soft gradient to prevent harsh cut-off */}
          </div>
       </div>
     </div>

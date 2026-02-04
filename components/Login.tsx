@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { User } from '../types';
+import { User } from '../types.ts';
 import { Phone, LogIn, ShieldCheck } from 'lucide-react';
 
 interface LoginProps {
@@ -33,7 +33,7 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
         <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-800">
           Interview Pro
         </h1>
-        <p className="text-slate-500 mt-2 font-medium">Candidate Evaluation System</p>
+        <p className="text-slate-500 mt-2 font-medium">ระบบประเมินผู้สมัครงาน</p>
       </div>
 
       <div className="w-full glass-card p-6 rounded-3xl shadow-xl">
@@ -72,7 +72,7 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
       </div>
 
       <p className="mt-12 text-slate-400 text-sm">
-        Authorized Personnel Only
+        เฉพาะเจ้าหน้าที่ที่ได้รับอนุญาตเท่านั้น
       </p>
     </div>
   );

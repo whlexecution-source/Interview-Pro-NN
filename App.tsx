@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { User, Candidate, Question, View } from './types';
-import { getInitialData } from './services/api';
-import Login from './components/Login';
-import CandidateList from './components/CandidateList';
-import EvaluationForm from './components/EvaluationForm';
+import { User, Candidate, Question, View } from './types.ts';
+import { getInitialData } from './services/api.ts';
+import Login from './components/Login.tsx';
+import CandidateList from './components/CandidateList.tsx';
+import EvaluationForm from './components/EvaluationForm.tsx';
 import { Loader2, RefreshCw } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -25,9 +25,9 @@ const App: React.FC = () => {
     try {
       const data = await getInitialData();
       if (data.status === 'success') {
-        setUsers(data.users);
-        setCandidates(data.candidates);
-        setQuestions(data.questions);
+        setUsers(data.users || []);
+        setCandidates(data.candidates || []);
+        setQuestions(data.questions || []);
       } else {
         setError('Data format error from server');
       }
@@ -55,7 +55,7 @@ const App: React.FC = () => {
   const handleBackToList = () => {
     setCurrentView('LIST');
     setSelectedCandidate(null);
-    fetchData(); // Refresh list after submission
+    fetchData(); 
   };
 
   if (isLoading && currentView === 'LOGIN') {
