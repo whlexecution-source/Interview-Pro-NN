@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Candidate, Question, User, EvaluationAnswer } from '../types.ts';
-import { ChevronLeft, Save, AlertCircle, CheckCircle, RefreshCw, Home } from 'lucide-react';
+import { ChevronLeft, Save, AlertCircle, CheckCircle, RefreshCw, Home, Info } from 'lucide-react';
 import { submitEvaluation } from '../services/api.ts';
 
 interface EvaluationFormProps {
@@ -127,9 +127,10 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
               <div key={q.id} className="glass-card p-5 rounded-3xl border-none shadow-sm space-y-4">
                 <h5 className="font-bold text-slate-800 text-[15px] leading-snug">{q.question}</h5>
                 
-                {/* แสดงรายละเอียดจาก Column F */}
-                <div className="w-full bg-slate-50 p-4 rounded-xl border border-slate-100 text-[11px] text-slate-600 min-h-[60px] flex items-center leading-relaxed whitespace-pre-line">
-                  {q.detail || "ไม่มีรายละเอียดเพิ่มเติม"}
+                {/* Condition Detail from Column F */}
+                <div className="w-full bg-blue-50 p-4 rounded-xl border border-blue-100 text-[11px] text-slate-600 min-h-[60px] flex items-start leading-relaxed whitespace-pre-line">
+                  <Info className="w-4 h-4 mr-2 shrink-0 text-blue-400 mt-0.5" />
+                  <div>{q.detail || "ไม่มีรายละเอียดเพิ่มเติม"}</div>
                 </div>
                 
                 <div className="grid grid-cols-3 gap-3">
@@ -146,7 +147,6 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
                             : 'bg-white text-slate-400 border-slate-100 hover:border-blue-200'}`}
                       >
                         <span className="text-[10px] font-black uppercase mb-1">{lvl}</span>
-                        {/* แสดงเฉพาะตัวเลขคะแนน */}
                         <span className={`text-sm font-bold ${isActive ? 'text-white' : 'text-slate-800'}`}>
                           {val}
                         </span>
@@ -170,7 +170,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-6 bg-gradient-to-t from-slate-50 via-slate-50 to-transparent">
+      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-6 bg-gradient-to-t from-slate-50 via-slate-50 to-transparent z-40">
         {error && (
           <div className="mb-4 p-4 bg-red-100 border border-red-200 rounded-2xl flex items-center gap-2 text-red-700 text-xs font-bold animate-fadeIn">
             <AlertCircle className="w-4 h-4 shrink-0" /> {error}
