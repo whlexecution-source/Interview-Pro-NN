@@ -1,0 +1,5 @@
+{
+  "name": "Interview Pro",
+  "description": "A professional mobile-first system for recruiters and supervisors to evaluate job candidates with Google Sheets synchronization.",
+  "requestFramePermissions": []
+}
