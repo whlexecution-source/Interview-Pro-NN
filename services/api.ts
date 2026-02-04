@@ -1,5 +1,5 @@
 
-import { InitialDataResponse } from '../types';
+import { InitialDataResponse } from '../types.ts';
 
 const API_URL = 'https://script.google.com/macros/s/AKfycby8Sct6bQeE8AvjbK3OgR9zPzenO5-AV9oLRKukfCqgBeBXV1dOpz7EcSfD52wF1d_mYA/exec';
 
@@ -12,7 +12,6 @@ export const getInitialData = async (): Promise<InitialDataResponse> => {
 };
 
 export const submitEvaluation = async (payload: any): Promise<void> => {
-  // Using no-cors as requested for simple GAS integration
   await fetch(API_URL, {
     method: 'POST',
     mode: 'no-cors',

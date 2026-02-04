@@ -14,7 +14,8 @@ export interface Candidate {
   name: string;
   position: string;
   area: string;
-  status: string; // e.g., 'รอสัมภาษณ์', 'สัมภาษณ์แล้ว'
+  status: string;
+  totalScore: number;
 }
 
 export interface Question {
@@ -22,7 +23,9 @@ export interface Question {
   category: string;
   question: string;
   detail: string;
-  weight: number;
+  scoreLow: number;
+  scoreMid: number;
+  scoreHigh: number;
 }
 
 export interface EvaluationAnswer {
