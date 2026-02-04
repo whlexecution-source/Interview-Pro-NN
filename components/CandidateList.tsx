@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Candidate, User } from '../types.ts';
-import { Search, MapPin, CheckCircle2, UserCircle2, ChevronRight, RefreshCw, Clock } from 'lucide-react';
+import { Search, MapPin, CheckCircle2, UserCircle2, ChevronRight, RefreshCw, Clock, XCircle } from 'lucide-react';
 
 interface CandidateListProps {
   candidates: Candidate[];
@@ -24,94 +24,81 @@ const CandidateList: React.FC<CandidateListProps> = ({ candidates, user, onSelec
   }, [candidates, user, searchQuery]);
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden animate-fadeIn">
+    <div className="flex flex-col h-screen overflow-hidden animate-fadeIn bg-slate-50">
       <header className="glass-header sticky top-0 z-30 px-6 pt-8 pb-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              <UserCircle2 className="w-6 h-6 text-blue-600" />
+            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-slate-200 shadow-sm">
+              <UserCircle2 className="w-7 h-7 text-slate-400" />
             </div>
             <div>
               <h2 className="font-bold text-slate-800 text-lg leading-tight">{user.name}</h2>
-              <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider">
-                {user.role === 'Recruiter' ? 'เจ้าหน้าที่สรรหา' : 'หัวหน้างาน'}
-              </span>
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{user.area}</span>
             </div>
           </div>
           <button 
             onClick={onRefresh}
-            className={`p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all ${isRefreshing ? 'animate-spin' : ''}`}
+            className={`p-3 rounded-2xl bg-white text-slate-400 hover:text-indigo-600 shadow-sm border border-slate-100 transition-all active:scale-90 ${isRefreshing ? 'animate-spin text-indigo-600' : ''}`}
             disabled={isRefreshing}
           >
             <RefreshCw className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+        <div className="relative group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
           <input
             type="text"
-            placeholder="ค้นหาชื่อ หรือตำแหน่งงาน..."
+            placeholder="ค้นหา..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-slate-100 border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all text-sm font-medium"
+            className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-100 rounded-2xl focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 transition-all text-sm font-medium shadow-sm outline-none"
           />
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 pb-24">
-        <div className="px-2 mb-4 text-center">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-            {user.role === 'Recruiter' ? 'รายชื่อผู้สมัครทั้งหมด' : `รายชื่อในพื้นที่ ${user.area}`}
-          </p>
-        </div>
-
+      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3 pb-28">
         {filteredCandidates.length === 0 ? (
-          <div className="text-center py-20 text-slate-400 font-medium">ไม่พบข้อมูลผู้สมัคร</div>
+          <div className="text-center py-20 text-slate-300 font-bold">ไม่พบข้อมูล</div>
         ) : (
           filteredCandidates.map(candidate => {
             const isDone = candidate.status === 'สัมภาษณ์แล้ว';
-            const isPassed = candidate.totalScore >= 80; // ปรับเกณฑ์ผ่านเป็น 80
+            const isPassed = Number(candidate.totalScore) >= 80;
 
             return (
               <button
                 key={candidate.id}
                 onClick={() => !isDone && onSelect(candidate)}
                 disabled={isDone}
-                className={`w-full text-left glass-card p-4 rounded-2xl flex items-center justify-between transition-all relative overflow-hidden
-                  ${isDone ? 'opacity-80 grayscale-[0.3]' : 'hover:border-blue-300 active:scale-95 group'}`}
+                className={`w-full text-left bg-white p-5 rounded-3xl flex items-center justify-between transition-all relative overflow-hidden border border-slate-100 shadow-sm
+                  ${isDone ? 'cursor-default' : 'hover:border-indigo-200 active:scale-[0.98] group'}`}
               >
-                <div className="flex items-start gap-4">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${isDone ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-400'}`}>
-                    {isDone ? <CheckCircle2 className="w-7 h-7" /> : <Clock className="w-7 h-7" />}
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-slate-800">{candidate.name}</h3>
-                    <p className="text-[10px] text-slate-500 font-medium">{candidate.position}</p>
-                    
-                    <div className="flex items-center gap-3 mt-2">
-                      <div className="flex items-center gap-1 text-[10px] text-slate-400 font-semibold uppercase">
-                        <MapPin className="w-3 h-3" />
-                        {candidate.area}
-                      </div>
-                      
-                      <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tight 
-                        ${isDone ? 'bg-green-500 text-white' : 'bg-slate-200 text-slate-500'}`}>
-                        {candidate.status}
+                <div className="flex flex-col gap-1 flex-1">
+                  <h3 className="font-bold text-slate-800 text-[17px] leading-tight">{candidate.name}</h3>
+                  <div className="flex items-center gap-2">
+                    {isDone ? (
+                      <span className={`flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-lg ${isPassed ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                        {isPassed ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+                        {isPassed ? 'ผ่าน' : 'ไม่ผ่าน'}
                       </span>
-                    </div>
-
-                    {isDone && (
-                      <div className="mt-2 flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-700">คะแนน: {candidate.totalScore}</span>
-                        <span className={`text-[10px] font-black px-2 rounded-lg ${isPassed ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'}`}>
-                          {isPassed ? 'ผ่าน' : 'ไม่ผ่าน'}
-                        </span>
-                      </div>
+                    ) : (
+                      <span className="text-[11px] font-bold text-amber-500 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-100 uppercase tracking-tighter">
+                        รอการประเมิน
+                      </span>
                     )}
                   </div>
                 </div>
-                {!isDone && <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-blue-400 transition-colors" />}
+
+                {isDone ? (
+                  <div className="text-right">
+                    <div className="text-2xl font-black text-slate-800 tabular-nums leading-none mb-1">{candidate.totalScore}</div>
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">คะแนน</div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5 px-4 py-2 bg-red-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-red-200 group-hover:bg-red-600 transition-colors">
+                    ประเมิน
+                  </div>
+                )}
               </button>
             );
           })
