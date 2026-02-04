@@ -60,7 +60,7 @@ const CandidateList: React.FC<CandidateListProps> = ({ candidates, user, onSelec
       </header>
 
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 pb-24">
-        <div className="px-2 mb-4">
+        <div className="px-2 mb-4 text-center">
           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
             {user.role === 'Recruiter' ? 'รายชื่อผู้สมัครทั้งหมด' : `รายชื่อในพื้นที่ ${user.area}`}
           </p>
@@ -71,7 +71,7 @@ const CandidateList: React.FC<CandidateListProps> = ({ candidates, user, onSelec
         ) : (
           filteredCandidates.map(candidate => {
             const isDone = candidate.status === 'สัมภาษณ์แล้ว';
-            const isPassed = candidate.totalScore >= 50;
+            const isPassed = candidate.totalScore >= 80; // ปรับเกณฑ์ผ่านเป็น 80
 
             return (
               <button
@@ -90,12 +90,11 @@ const CandidateList: React.FC<CandidateListProps> = ({ candidates, user, onSelec
                     <p className="text-[10px] text-slate-500 font-medium">{candidate.position}</p>
                     
                     <div className="flex items-center gap-3 mt-2">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-3 h-3 text-slate-400" />
-                        <span className="text-[10px] text-slate-400 font-semibold">{candidate.area}</span>
+                      <div className="flex items-center gap-1 text-[10px] text-slate-400 font-semibold uppercase">
+                        <MapPin className="w-3 h-3" />
+                        {candidate.area}
                       </div>
                       
-                      {/* Badge สถานะ */}
                       <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tight 
                         ${isDone ? 'bg-green-500 text-white' : 'bg-slate-200 text-slate-500'}`}>
                         {candidate.status}
