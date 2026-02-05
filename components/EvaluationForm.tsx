@@ -19,22 +19,15 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
   const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // ดึงคะแนนจากหัวตาราง low, mid, high (รองรับทั้ง lowercase และ camelCase)
   const getScoreValue = (q: any, level: 'Low' | 'Mid' | 'High'): number => {
-    const key = level.toLowerCase(); // 'low', 'mid', 'high'
-    const altKey = `score${level}`; // 'scoreLow', etc.
-    
+    const key = level.toLowerCase();
+    const altKey = `score${level}`;
     const val = q[key] !== undefined ? q[key] : q[altKey];
     return Number(val) || 0;
   };
 
-  // ดึง ID ของคำถามจาก qid (คอลัมน์ G ใน Sheet)
   const getQuestionId = (q: Question) => {
-    // ต้องเป็น String และ Trim เพื่อป้องกันความผิดพลาด
-    const id = String(q.qid || '').trim();
-    if (id) return id;
-    // Fallback กรณี qid ว่าง (ไม่แนะนำ)
-    return `${q.category}_${q.question}`.replace(/\s+/g, '_');
+    return String(q.qid || '').trim() || `${q.category}_${q.question}`.replace(/\s+/g, '_');
   };
 
   const categories = useMemo(() => {
@@ -59,7 +52,6 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
   const handleScore = (q: Question, level: 'Low' | 'Mid' | 'High') => {
     const qId = getQuestionId(q);
     const scoreVal = getScoreValue(q, level);
-    
     setAnswers(prev => ({
       ...prev,
       [qId]: { questionId: qId, level, score: scoreVal }
@@ -79,10 +71,11 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
         action: 'submitEvaluation',
         candidateId: candidate.candidate_name,
         candidateName: candidate.candidate_name,
-        area: candidate.area,
+        area: candidate.area, // เพิ่มการส่ง Area
         role: user.role,
         evaluatorName: user.name,
         totalScore: totalScore,
+        maxScore: maxPossibleScore, // เพิ่มการส่ง Max Score ให้ตรงหัวตาราง GAS
         answers: Object.values(answers).map(a => ({
           qid: a.questionId,
           level: a.level,
