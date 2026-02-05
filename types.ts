@@ -11,6 +11,7 @@ export interface User {
 export interface Candidate {
   candidate_name: string;
   area: string;
+  "store name": string; // แมพตรงกับหัวตาราง Column C
   phone: string;
   sup_status: string;
   sup_score: number | string;
@@ -19,14 +20,13 @@ export interface Candidate {
 }
 
 export interface Question {
-  qid: string; // อัปเดตจาก id เป็น qid ตามหัวตาราง
+  qid: string;
   category: string;
   question: string;
   detail: string;
-  low: number;  // อัปเดตให้ตรงตาม Sheet
-  mid: number;  // อัปเดตให้ตรงตาม Sheet
-  high: number; // อัปเดตให้ตรงตาม Sheet
-  // รองรับชื่อสำรองเผื่อ API มีการแมพชื่ออื่น
+  low: number;
+  mid: number;
+  high: number;
   scoreLow?: number;
   scoreMid?: number;
   scoreHigh?: number;

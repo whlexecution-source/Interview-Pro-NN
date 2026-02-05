@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Candidate, Question, User, EvaluationAnswer } from '../types.ts';
-import { ChevronLeft, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
+import { ChevronLeft, AlertCircle, CheckCircle, RefreshCw, Store } from 'lucide-react';
 import { submitEvaluation } from '../services/api.ts';
 
 interface EvaluationFormProps {
@@ -71,11 +71,12 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
         action: 'submitEvaluation',
         candidateId: candidate.candidate_name,
         candidateName: candidate.candidate_name,
-        area: candidate.area, // เพิ่มการส่ง Area
+        area: candidate.area,
+        "store name": candidate["store name"],
         role: user.role,
         evaluatorName: user.name,
         totalScore: totalScore,
-        maxScore: maxPossibleScore, // เพิ่มการส่ง Max Score ให้ตรงหัวตาราง GAS
+        maxScore: maxPossibleScore,
         answers: Object.values(answers).map(a => ({
           qid: a.questionId,
           level: a.level,
@@ -111,8 +112,14 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
         <button onClick={onBack} className="absolute left-4 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-indigo-600 transition-colors">
           <ChevronLeft className="w-6 h-6" />
         </button>
-        <h2 className="font-bold text-slate-800 text-[16px] text-center leading-tight">{candidate.candidate_name}</h2>
-        <div className="flex items-center gap-1.5 mt-0.5">
+        <div className="text-center">
+          <h2 className="font-bold text-slate-800 text-[16px] leading-tight">{candidate.candidate_name}</h2>
+          <div className="flex items-center justify-center gap-1 mt-0.5">
+             <Store className="w-3 h-3 text-indigo-500" />
+             <span className="text-[11px] font-black text-indigo-600 uppercase tracking-wide">{candidate["store name"] || "N/A"}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 mt-2">
            <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded uppercase tracking-widest">{user.role} EVALUATION</span>
         </div>
       </header>

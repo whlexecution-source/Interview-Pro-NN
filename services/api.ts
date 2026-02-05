@@ -2,7 +2,7 @@
 import { InitialDataResponse } from '../types.ts';
 
 // ตรวจสอบให้แน่ใจว่า API_URL เป็นอันล่าสุดจาก "Deploy > New Deployment" ใน GAS
-const API_URL = 'https://script.google.com/macros/s/AKfycbw0_we5DSvsShArFkY9ug-H0xYnzpKFpSCrzeyaiNXlRon5KgZEWV_yR0vmJ4K2Xu-9iQ/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyo0Q1Us7Hr-Vi9gJvQFq7kbgEFd5A-y72a3iAntVFzBMWK6RNcZDQStF_IBlT52uvzAw/exec';
 
 export const getInitialData = async (): Promise<InitialDataResponse> => {
   try {

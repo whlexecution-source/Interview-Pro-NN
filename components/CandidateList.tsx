@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Candidate, User } from '../types.ts';
-import { Search, CheckCircle2, RefreshCw, XCircle, LogOut, UserCircle, MapPin } from 'lucide-react';
+import { Search, CheckCircle2, RefreshCw, XCircle, LogOut, UserCircle, MapPin, Store } from 'lucide-react';
 
 interface CandidateListProps {
   candidates: Candidate[];
@@ -17,8 +17,11 @@ const CandidateList: React.FC<CandidateListProps> = ({ candidates, user, onSelec
   const filteredCandidates = useMemo(() => {
     return candidates.filter(c => {
       const areaMatch = user.area === 'All' || c.area === user.area;
-      const searchMatch = c.candidate_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          c.area.toLowerCase().includes(searchQuery.toLowerCase());
+      const storeName = c["store name"] || '';
+      const searchMatch = 
+        c.candidate_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        c.area.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        storeName.toLowerCase().includes(searchQuery.toLowerCase());
       return areaMatch && searchMatch;
     });
   }, [candidates, user, searchQuery]);
@@ -67,7 +70,7 @@ const CandidateList: React.FC<CandidateListProps> = ({ candidates, user, onSelec
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
           <input
             type="text"
-            placeholder="ค้นหาชื่อผู้สมัคร..."
+            placeholder="ค้นหาชื่อ, ร้าน หรือพื้นที่..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-12 pr-4 py-4 bg-white border border-slate-100 rounded-2xl focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 transition-all text-sm font-medium shadow-sm outline-none"
@@ -83,10 +86,8 @@ const CandidateList: React.FC<CandidateListProps> = ({ candidates, user, onSelec
           </div>
         ) : (
           filteredCandidates.map(candidate => {
-            // ดึงข้อมูลตามหัวตารางใหม่ (ตัวพิมพ์เล็ก)
             const roleStatus = user.role === 'Supervisor' ? candidate.sup_status : candidate.rec_status;
             const roleScore = user.role === 'Supervisor' ? candidate.sup_score : candidate.rec_score;
-            
             const isDone = roleStatus === 'สัมภาษณ์แล้ว';
             const scoreNum = Number(roleScore) || 0;
             const isPassed = scoreNum >= 80;
@@ -100,19 +101,20 @@ const CandidateList: React.FC<CandidateListProps> = ({ candidates, user, onSelec
                   ${isDone ? 'bg-slate-50/50 shadow-inner' : 'hover:border-indigo-200 hover:shadow-md active:scale-[0.98] group'}`}
               >
                 <div className="flex flex-col gap-1.5 flex-1 pr-4">
-                  <div className="flex items-center gap-2">
-                     <h3 className="font-black text-slate-800 text-lg leading-tight">{candidate.candidate_name}</h3>
-                     {isDone && (
-                       <div className={`w-2 h-2 rounded-full ${isPassed ? 'bg-green-500' : 'bg-rose-500'}`}></div>
-                     )}
+                  <h3 className="font-black text-slate-800 text-lg leading-tight">{candidate.candidate_name}</h3>
+                  
+                  <div className="flex flex-col gap-1 mt-0.5">
+                    <div className="flex items-center gap-1.5 text-indigo-500">
+                      <Store className="w-3.5 h-3.5 shrink-0" />
+                      <span className="text-[11px] font-black uppercase tracking-wide">{candidate["store name"] || "N/A"}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-slate-400">
+                      <MapPin className="w-3 h-3" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest">{candidate.area}</span>
+                    </div>
                   </div>
                   
-                  <div className="flex items-center gap-1.5 text-slate-400">
-                    <MapPin className="w-3 h-3" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest">{candidate.area}</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 mt-2">
+                  <div className="flex items-center gap-2 mt-3">
                     {isDone ? (
                       <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${isPassed ? 'bg-green-100 text-green-700' : 'bg-rose-100 text-rose-700'}`}>
                         {isPassed ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
