@@ -1,7 +1,7 @@
 
 import { InitialDataResponse } from '../types.ts';
 
-const API_URL = 'https://script.google.com/macros/s/AKfycbyd2ghZ7EflL-ZkIo3ZaOt41uQLEOgezP1Gsp2aY0jQure0XjUz8ZWOVtWU8ymh4XhqIg/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzkVbJZs4PLMe01oIhcFGnrvEruksyzkQkjKP04Rs8278Od8702LvWkLbBgWuMbxfeVXg/exec';
 
 export const getInitialData = async (): Promise<InitialDataResponse> => {
   const response = await fetch(`${API_URL}?action=getInitialData`);

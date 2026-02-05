@@ -14,8 +14,11 @@ export interface Candidate {
   name: string;
   position: string;
   area: string;
-  status: string;
-  totalScore: number;
+  // ข้อมูลที่ดึงจาก Sheets ชุดใหม่
+  Sup_Status: string;
+  Sup_Score: number;
+  Rec_Status: string;
+  Rec_Score: number;
 }
 
 export interface Question {
