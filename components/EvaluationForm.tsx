@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Candidate, Question, User, EvaluationAnswer } from '../types.ts';
-import { ChevronLeft, Save, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
+import { ChevronLeft, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 import { submitEvaluation } from '../services/api.ts';
 
 interface EvaluationFormProps {
@@ -19,6 +19,24 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
   const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // ดึงคะแนนจากหัวตาราง low, mid, high (รองรับทั้ง lowercase และ camelCase)
+  const getScoreValue = (q: any, level: 'Low' | 'Mid' | 'High'): number => {
+    const key = level.toLowerCase(); // 'low', 'mid', 'high'
+    const altKey = `score${level}`; // 'scoreLow', etc.
+    
+    const val = q[key] !== undefined ? q[key] : q[altKey];
+    return Number(val) || 0;
+  };
+
+  // ดึง ID ของคำถามจาก qid (คอลัมน์ G ใน Sheet)
+  const getQuestionId = (q: Question) => {
+    // ต้องเป็น String และ Trim เพื่อป้องกันความผิดพลาด
+    const id = String(q.qid || '').trim();
+    if (id) return id;
+    // Fallback กรณี qid ว่าง (ไม่แนะนำ)
+    return `${q.category}_${q.question}`.replace(/\s+/g, '_');
+  };
+
   const categories = useMemo(() => {
     const map: Record<string, Question[]> = {};
     questions.forEach(q => {
@@ -33,22 +51,24 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
   }, [answers]);
 
   const maxPossibleScore = useMemo(() => {
-    return questions.reduce((acc, q) => acc + (Number(q.scoreHigh) || 0), 0);
+    return questions.reduce((acc, q) => acc + getScoreValue(q, 'High'), 0);
   }, [questions]);
 
   const isPassing = totalScore >= 80;
 
   const handleScore = (q: Question, level: 'Low' | 'Mid' | 'High') => {
-    const scoreVal = level === 'Low' ? q.scoreLow : level === 'Mid' ? q.scoreMid : q.scoreHigh;
+    const qId = getQuestionId(q);
+    const scoreVal = getScoreValue(q, level);
+    
     setAnswers(prev => ({
       ...prev,
-      [q.id]: { questionId: q.id, level, score: Number(scoreVal) || 0 }
+      [qId]: { questionId: qId, level, score: scoreVal }
     }));
   };
 
   const handleSubmit = async () => {
     if (Object.keys(answers).length < questions.length) {
-      setError('กรุณาประเมินให้ครบทุกหัวข้อ');
+      setError(`กรุณาประเมินให้ครบทุกหัวข้อ (ทำแล้ว ${Object.keys(answers).length}/${questions.length})`);
       return;
     }
 
@@ -57,13 +77,17 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
     try {
       await submitEvaluation({
         action: 'submitEvaluation',
-        candidateId: candidate.candidate_name, // ใช้ชื่อเป็น ID ในการค้นหาตามโค้ด GAS
+        candidateId: candidate.candidate_name,
         candidateName: candidate.candidate_name,
         area: candidate.area,
         role: user.role,
         evaluatorName: user.name,
         totalScore: totalScore,
-        answers: Object.values(answers),
+        answers: Object.values(answers).map(a => ({
+          qid: a.questionId,
+          level: a.level,
+          score: a.score
+        })),
         comment: comments
       });
       
@@ -105,43 +129,46 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
           <div key={category} className="space-y-6">
             <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] border-l-4 border-indigo-500 pl-3">{category}</h4>
             
-            {qs.map((q, qIndex) => (
-              <div key={q.id} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm space-y-5">
-                <div className="flex items-start gap-4">
-                  <span className="text-indigo-600 font-black text-sm pt-1.5">{String(qIndex + 1).padStart(2, '0')}</span>
-                  <h5 className="font-bold text-slate-800 text-[16px] leading-snug pt-1.5">{q.question}</h5>
+            {qs.map((q, qIndex) => {
+              const qId = getQuestionId(q);
+              return (
+                <div key={qId} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm space-y-5">
+                  <div className="flex items-start gap-4">
+                    <span className="text-indigo-600 font-black text-sm pt-1.5">{String(qIndex + 1).padStart(2, '0')}</span>
+                    <h5 className="font-bold text-slate-800 text-[16px] leading-snug pt-1.5">{q.question}</h5>
+                  </div>
+                  
+                  <div className="bg-slate-50 p-5 rounded-[1.5rem] border border-slate-100 text-[12px] leading-relaxed text-slate-500 whitespace-pre-line font-medium italic">
+                    {q.detail || "พิจารณาตามความเหมาะสม"}
+                  </div>
+                  
+                  <div className="grid grid-cols-3 gap-3 pt-2">
+                    {(['Low', 'Mid', 'High'] as const).map(lvl => {
+                      const isActive = answers[qId]?.level === lvl;
+                      const score = getScoreValue(q, lvl);
+                      
+                      return (
+                        <button
+                          key={lvl}
+                          onClick={() => handleScore(q, lvl)}
+                          className={`py-4 px-1 rounded-2xl transition-all border-2 flex flex-col items-center justify-center gap-1
+                            ${isActive 
+                              ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-100 -translate-y-1' 
+                              : 'bg-white text-slate-400 border-slate-100 active:scale-95'}`}
+                        >
+                          <span className={`text-[11px] font-black uppercase tracking-wider`}>
+                            {lvl}
+                          </span>
+                          <span className={`text-[10px] font-bold ${isActive ? 'text-indigo-100' : 'text-slate-300'}`}>
+                            {score} pt
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-                
-                <div className="bg-slate-50 p-5 rounded-[1.5rem] border border-slate-100 text-[12px] leading-relaxed text-slate-500 whitespace-pre-line font-medium italic">
-                  {q.detail || "พิจารณาตามความเหมาะสม"}
-                </div>
-                
-                <div className="grid grid-cols-3 gap-3 pt-2">
-                  {(['High', 'Mid', 'Low'] as const).map(lvl => {
-                    const isActive = answers[q.id]?.level === lvl;
-                    const score = lvl === 'Low' ? q.scoreLow : lvl === 'Mid' ? q.scoreMid : q.scoreHigh;
-                    
-                    return (
-                      <button
-                        key={lvl}
-                        onClick={() => handleScore(q, lvl)}
-                        className={`py-4 px-1 rounded-2xl transition-all border-2 flex flex-col items-center justify-center gap-1
-                          ${isActive 
-                            ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-100 -translate-y-1' 
-                            : 'bg-white text-slate-400 border-slate-100 active:scale-95'}`}
-                      >
-                        <span className={`text-[11px] font-black uppercase tracking-wider`}>
-                          {lvl}
-                        </span>
-                        <span className={`text-[10px] font-bold ${isActive ? 'text-indigo-100' : 'text-slate-300'}`}>
-                          {score} pt
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ))}
 

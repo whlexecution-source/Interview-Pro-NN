@@ -5,7 +5,7 @@ export interface User {
   name: string;
   role: Role;
   area: string;
-  tel: string; // เปลี่ยนจาก phone เป็น tel
+  tel: string; 
 }
 
 export interface Candidate {
@@ -19,13 +19,17 @@ export interface Candidate {
 }
 
 export interface Question {
-  id: string;
+  qid: string; // อัปเดตจาก id เป็น qid ตามหัวตาราง
   category: string;
   question: string;
   detail: string;
-  scoreLow: number;
-  scoreMid: number;
-  scoreHigh: number;
+  low: number;  // อัปเดตให้ตรงตาม Sheet
+  mid: number;  // อัปเดตให้ตรงตาม Sheet
+  high: number; // อัปเดตให้ตรงตาม Sheet
+  // รองรับชื่อสำรองเผื่อ API มีการแมพชื่ออื่น
+  scoreLow?: number;
+  scoreMid?: number;
+  scoreHigh?: number;
 }
 
 export interface EvaluationAnswer {
