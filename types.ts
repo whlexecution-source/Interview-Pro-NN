@@ -10,15 +10,13 @@ export interface User {
 }
 
 export interface Candidate {
-  id: string;
-  name: string;
-  position: string;
+  candidate_name: string;
   area: string;
-  // ข้อมูลที่ดึงจาก Sheets ชุดใหม่
-  Sup_Status: string;
-  Sup_Score: number;
-  Rec_Status: string;
-  Rec_Score: number;
+  phone: string;
+  sup_status: string;
+  sup_score: number | string;
+  rec_status: string;
+  rec_score: number | string;
 }
 
 export interface Question {

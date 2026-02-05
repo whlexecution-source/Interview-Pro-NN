@@ -1,22 +1,31 @@
 
 import { InitialDataResponse } from '../types.ts';
 
-const API_URL = 'https://script.google.com/macros/s/AKfycbzkVbJZs4PLMe01oIhcFGnrvEruksyzkQkjKP04Rs8278Od8702LvWkLbBgWuMbxfeVXg/exec';
+// ตรวจสอบให้แน่ใจว่า API_URL เป็นอันล่าสุดจาก "Deploy > New Deployment" ใน GAS
+const API_URL = 'https://script.google.com/macros/s/AKfycbz7pXlVQA81rzoX5hLhTLNHhgJFT596raeTYOTOL3SNmFiXrR6S6Ou5qFXYHpfOAOqXmw/exec';
 
 export const getInitialData = async (): Promise<InitialDataResponse> => {
-  const response = await fetch(`${API_URL}?action=getInitialData`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch initial data');
+  try {
+    const response = await fetch(`${API_URL}?action=getInitialData`);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Fetch initial data error:", error);
+    throw error;
   }
-  return response.json();
 };
 
 export const submitEvaluation = async (payload: any): Promise<void> => {
+  // สำหรับ GAS เรามักใช้ mode: 'no-cors' ในการ POST 
+  // แต่ถ้าต้องการเช็คความสำเร็จแบบ 100% ต้องใช้ fetch แบบปกติ (ซึ่งต้องตั้งค่า CORS ใน GAS ด้วย)
+  // ในที่นี้เราใช้เทคนิคส่งผ่าน POST ปกติ
   await fetch(API_URL, {
     method: 'POST',
-    mode: 'no-cors',
+    mode: 'no-cors', // ข้อจำกัด: เราจะไม่เห็น Response กลับมา แต่ข้อมูลจะไปถึง Sheets
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'text/plain', // GAS doPost รับ JSON ได้ดีกว่าผ่าน text/plain หรือ form-data
     },
     body: JSON.stringify({
       action: 'submitEvaluation',

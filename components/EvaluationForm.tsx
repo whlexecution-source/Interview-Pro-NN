@@ -57,10 +57,10 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
     try {
       await submitEvaluation({
         action: 'submitEvaluation',
-        candidateId: candidate.id,
-        candidateName: candidate.name,
+        candidateId: candidate.candidate_name, // ใช้ชื่อเป็น ID ในการค้นหาตามโค้ด GAS
+        candidateName: candidate.candidate_name,
         area: candidate.area,
-        role: user.role, // ส่ง Role เพื่อให้ Backend รู้ว่าต้องอัปเดต Col ไหน
+        role: user.role,
         evaluatorName: user.name,
         totalScore: totalScore,
         answers: Object.values(answers),
@@ -94,7 +94,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
         <button onClick={onBack} className="absolute left-4 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-indigo-600 transition-colors">
           <ChevronLeft className="w-6 h-6" />
         </button>
-        <h2 className="font-bold text-slate-800 text-[16px] text-center leading-tight">{candidate.name}</h2>
+        <h2 className="font-bold text-slate-800 text-[16px] text-center leading-tight">{candidate.candidate_name}</h2>
         <div className="flex items-center gap-1.5 mt-0.5">
            <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded uppercase tracking-widest">{user.role} EVALUATION</span>
         </div>
@@ -145,7 +145,6 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({ candidate, questions, u
           </div>
         ))}
 
-        {/* Real-time Summary Card */}
         <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm space-y-4">
           <div className="flex items-center justify-between text-[11px] font-black text-slate-400 uppercase tracking-widest">
             <span>ผลประเมินเบื้องต้น</span>
