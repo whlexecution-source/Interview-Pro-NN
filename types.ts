@@ -2,11 +2,10 @@
 export type Role = 'Recruiter' | 'Supervisor';
 
 export interface User {
-  id: string;
   name: string;
-  phone: string;
   role: Role;
   area: string;
+  tel: string; // เปลี่ยนจาก phone เป็น tel
 }
 
 export interface Candidate {

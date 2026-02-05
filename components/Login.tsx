@@ -16,7 +16,6 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
     e.preventDefault();
     setError(null);
 
-    // ตัดช่องว่างหน้า-หลังออก เพื่อป้องกันการเผลอเคาะ Space
     const cleanPhone = phoneNumber.trim();
 
     if (!cleanPhone) {
@@ -24,13 +23,14 @@ const Login: React.FC<LoginProps> = ({ users, onLogin }) => {
       return;
     }
 
-    const user = users.find(u => String(u.phone).trim() === cleanPhone);
+    // แก้ไขจาก u.phone เป็น u.tel ตามหัวตารางใน Sheet hierarchy
+    const user = users.find(u => String(u.tel).trim() === cleanPhone);
     
     if (user) {
       onLogin(user);
     } else {
       setError('ไม่พบหมายเลขโทรศัพท์นี้ในระบบ หรือคุณยังไม่ได้รับอนุญาต');
-      console.log('Available users:', users); // ช่วย Debug ดูข้อมูลที่โหลดมาได้
+      console.log('Available users:', users);
     }
   };
 
